@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拆分 PDF</title>
+</head>
+<body>
+    <h1>拆分 PDF</h1>
+    <form id="splitPdfForm" action="/api/split-pdf" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="application/pdf" required />
+        <button type="submit">開始拆分</button>
+    </form>
+</body>
+</html>

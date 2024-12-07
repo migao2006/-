@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word 轉 PDF</title>
+</head>
+<body>
+    <h1>Word 轉 PDF</h1>
+    <form id="wordToPdfForm" action="/api/word-to-pdf" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".doc,.docx" required />
+        <button type="submit">開始轉換</button>
+    </form>
+</body>
+</html>

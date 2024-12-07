@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合併 PDF</title>
+</head>
+<body>
+    <h1>合併 PDF</h1>
+    <form id="mergePdfForm" action="/api/merge-pdf" method="post" enctype="multipart/form-data">
+        <input type="file" name="files" accept="application/pdf" multiple required />
+        <button type="submit">開始合併</button>
+    </form>
+</body>
+</html>
