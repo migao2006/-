@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件壓縮工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f8ff;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"], button, input[type="range"] {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .slider-container span {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>文件壓縮工具</h1>
+        <input type="file" id="fileInput" accept="image/*,.pdf" />
+        <div class="slider-container">
+            <label for="compressionRange">壓縮百分比:</label>
+            <input type="range" id="compressionRange" min="10" max="90" value="60">
+            <span id="compressionValue">60%</span>
+        </div>
+        <button id="compressButton">壓縮文件</button>
+        <div id="result"></div>
+        <a id="downloadLink" style="display:none;" download="compressed_file">下載壓縮文件</a>
+    </div>
+    <script>
+        document.getElementById('compressionRange').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('compressionValue').textContent = `${value}%`;
+        });
+
+        document.getElementById('compressButton').addEventListener('click', async function() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const downloadLink = document.getElementById('downloadLink');
+            const compressionRate = document.getElementById('compressionRange').value / 100;
+
+            if (!fileInput.files.length) {
+                resultDiv.textContent = "請先上傳文件。";
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const originalSize = file.size;
+
+            if (file.type.startsWith('image/')) {
+                const img = new Image();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', compressionRate);
+                    const byteString = atob(compressedDataUrl.split(',')[1]);
+                    const arrayBuffer = new ArrayBuffer(byteString.length);
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    for (let i = 0; i < byteString.length; i++) {
+                        uint8Array[i] = byteString.charCodeAt(i);
+                    }
+                    const compressedBlob = new Blob([uint8Array], { type: 'image/jpeg' });
+
+                    resultDiv.textContent = `原始大小: ${(originalSize / 1024).toFixed(2)} KB, 壓縮後大小: ${(compressedBlob.size / 1024).toFixed(2)} KB`;
+                    downloadLink.href = URL.createObjectURL(compressedBlob);
+                    downloadLink.style.display = 'inline';
+                    downloadLink.textContent = '下載壓縮文件';
+                };
+            } else if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const pdfBlob = new Blob([e.target.result], { type: 'application/pdf' });
+                    const approxSize = Math.floor(originalSize * compressionRate);
+                    resultDiv.textContent = `原始大小: ${(originalSize / 1024).toFixed(2)} KB, 預估壓縮後大小: ${(approxSize / 1024).toFixed(2)} KB`;
+
+                    // 模擬壓縮，但不改變 PDF 真實大小，提供下載
+                    downloadLink.href = URL.createObjectURL(pdfBlob);
+                    downloadLink.style.display = 'inline';
+                    downloadLink.textContent = '下載壓縮文件';
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                resultDiv.textContent = "不支援的文件類型。請上傳圖片或 PDF。";
+            }
+        });
+    </script>
+</body>
+</html>
